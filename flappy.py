@@ -26,5 +26,6 @@ while True:
             pygame.quit()
     screen.blit(bg,(0,0))
     bird_group.draw(screen)
-    pygame.display.update() 
+    pygame.display.update()  
+    
 
