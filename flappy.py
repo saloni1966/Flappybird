@@ -33,17 +33,18 @@ class Bird(pygame.sprite.Sprite):
         self.movement = 0
 
     def update(self):
-        self.movement += gravity
-        self.rect.y += self.movement
+        if bird_fly == True:
+            self.movement += gravity
+            #self.rect.y += self.movement 
+            if self.movement>3: 
+                self.movement = 3 
+            if self.rect.bottom < 600: 
+                self.rect.y += self.movement
 
-        if self.rect.bottom > HEIGHT:
-            self.rect.bottom = HEIGHT
-            
-        elif self.rect.top < 0:
-            self.rect.top = 0
+  
 
     #def jump(self):
-        #self.movement = jump_strength
+        self.movement = jump_strength
 
 bird = Bird(200, 300) 
 bird_group = pygame.sprite.Group()
@@ -68,9 +69,14 @@ class Button():
         self.image = pygame.image.load(r'C:\Users\aruni\OneDrive\Documents\Game Dev 2\Flappy bird\retry.png') 
         self.rect = self.image.get_rect() 
         self.rect.topleft = [x,y]   
-    def draw(self):  
-        restart = False 
-        screen.blit(self.image, (self.rect.x,self.rect.y))  
+    def draw(self):   
+        restart = False   
+        pos = pygame.mouse.get_pos() 
+        if self.rect.collidepoint(pos): 
+            if pygame.mouse.get_pressed()[0] == 1: 
+                restart = True  
+        screen.blit(self.image, (self.rect.x,self.rect.y))
+        return restart
 #making object for button 
 button = Button(300,400)
 
@@ -86,17 +92,25 @@ pipe_group = pygame.sprite.Group()
 def display_score(score):
     score_text = font.render(f'Score: {score}', True, (255, 255, 255))
     screen.blit(score_text, (WIDTH - 200, 20))
-
+def reset(): 
+    bird.rect.x = 100 
+    bird.rect.y = 100 
+    pipe_group.empty() 
+    
 run = True
 while run:
     clock.tick(60)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE and game_over == False and bird_fly == False:
-                bird_fly = True
-                #bird.jump()
+        #if event.type == pygame.KEYDOWN:
+            #if event.key == pygame.MOUSEBUTTONDOWN and game_over == False :
+                #bird_fly = True
+                #bird.jump() 
+        if event.type == pygame.MOUSEBUTTONDOWN and game_over == False and bird_fly == False: 
+            bird_fly = True  
+            
+
     
     if not game_over and bird_fly:
         time_now = pygame.time.get_ticks()
@@ -132,12 +146,15 @@ while run:
 
     if pygame.sprite.groupcollide(bird_group,pipe_group,False,False): 
         game_over = True    
-        bird_fly = False
-
+        bird_fly = False 
+        scroll_speed = 0 
+    
+ 
     if game_over == True: 
         if button.draw() == True: 
             game_over = False 
-            
+            score = 0   
+            reset()
 
         #screen.blit(retry, (400,300))
 
@@ -151,9 +168,11 @@ while run:
     bird_group.draw(screen)
 
     # Display the score
-    display_score(score)
+    display_score(score) 
 
     # Update display
-    pygame.display.update()
+    pygame.display.update() 
+
+
 
 pygame.quit()
